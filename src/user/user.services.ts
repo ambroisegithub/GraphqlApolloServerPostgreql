@@ -28,16 +28,18 @@ export class UserService {
   async deleteUser(id: number): Promise<string> {
     const user = await this.userRepo.findOne({ where: { id } });
     if (!user) {
-      throw new HttpException(
-        `User with ID ${id} not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException(`User with ID ${id} not found`, HttpStatus.NOT_FOUND);
     }
     await this.userRepo.remove(user);
     return 'Data has been deleted successfully';
   }
 
   async addUser(addUserArgs: AddUserArgs): Promise<string> {
+    const existingUser = await this.userRepo.findOne({ where: { email: addUserArgs.email } });
+    if (existingUser) {
+      throw new HttpException('Email is already registered', HttpStatus.BAD_REQUEST);
+    }
+
     const user: UserEntity = new UserEntity();
     user.firstname = addUserArgs.firstname;
     user.lastname = addUserArgs.lastname;
@@ -48,14 +50,9 @@ export class UserService {
   }
 
   async updateUser(updateUserArgs: UpdateUserArgs): Promise<string> {
-    const user: UserEntity = await this.userRepo.findOne({
-      where: { id: updateUserArgs.id },
-    });
+    const user: UserEntity = await this.userRepo.findOne({ where: { id: updateUserArgs.id } });
     if (!user) {
-      throw new HttpException(
-        `User with ID ${updateUserArgs.id} not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException(`User with ID ${updateUserArgs.id} not found`, HttpStatus.NOT_FOUND);
     }
     user.firstname = updateUserArgs.firstname;
     user.lastname = updateUserArgs.lastname;
@@ -68,11 +65,12 @@ export class UserService {
   async loginUser(email: string, password: string): Promise<string> {
     const user: UserEntity = await this.userRepo.findOne({ where: { email } });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED);
     }
     if (!compareSync(password, user.password)) {
-      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED);
     }
     return 'Login successful';
   }
 }
+

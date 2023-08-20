@@ -28,8 +28,12 @@ export class UserResolver {
 
   @Mutation(() => String, { name: 'addUser' })
   async addUser(@Args('addUserArgs') addUserArgs: AddUserArgs) {
-    const result = await this.userService.addUser(addUserArgs);
-    return result;
+    try {
+      const result = await this.userService.addUser(addUserArgs);
+      return result;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Mutation(() => String, { name: 'updateUser' })
@@ -47,7 +51,7 @@ export class UserResolver {
       const result = await this.userService.loginUser(email, password);
       return result;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED);
     }
   }
 }
