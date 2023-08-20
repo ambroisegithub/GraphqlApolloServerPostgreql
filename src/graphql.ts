@@ -41,6 +41,7 @@ export interface IMutation {
     deleteUser(userId: number): string | Promise<string>;
     addUser(addUserArgs: AddUserArgs): string | Promise<string>;
     updateUser(updateUserArgs: UpdateUserArgs): string | Promise<string>;
+    loginUser(email: string, password: string): string | Promise<string>;
 }
 
 type Nullable<T> = T | null;

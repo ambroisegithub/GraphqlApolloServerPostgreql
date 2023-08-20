@@ -20,6 +20,7 @@ type Mutation {
   deleteUser(userId: Float!): String!
   addUser(addUserArgs: AddUserArgs!): String!
   updateUser(updateUserArgs: UpdateUserArgs!): String!
+  loginUser(email: String!, password: String!): String!
 }
 
 input AddUserArgs {
